@@ -5,8 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle</title>
     <script src="./dist/index.js" defer></script>
+    <link rel="stylesheet" href="./styles/base.css">
 </head>
 <body>
-    <h1>Wordle</h1>
+    <div id="gameBoard">
+        <div class="row">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+        </div>
+        <div class="row">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+        </div>
+        <div class="row">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+        </div>
+        <div class="row">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+        </div>
+        <div class="row">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+        </div>
+        <div class="row">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+            <input type="text" class="box" maxlength="1">
+        </div>
+    </div>
+
+    <script>
+        let box = document.getElementsByClassName("box");
+
+        for (let i = 0; i < box.length; i++) {
+            box[i].addEventListener("mousedown", function(event) {
+                event.preventDefault();
+            })
+        }
+    </script>
 </body>
 </html>

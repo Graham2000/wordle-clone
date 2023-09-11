@@ -1,0 +1,52 @@
+@import "config";
+
+html, body {
+    background-color: $backgroundColor;
+    color: $textColor;
+    width: 100%;
+    padding-top: 30px;
+}
+
+@mixin center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameBoard {
+    width: 100%;
+    background-color: $backgroundColor;
+    padding: 10px;
+    @include center;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+
+    .box {
+        font-size: 30px;
+        width: 60px;
+        height: 60px;
+        margin: 2px;
+        background-color: $backgroundColor;
+        color: $textColor;
+        border: 1px solid #3a2e2e;
+        text-align: center;
+        text-transform: capitalize;
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        &:focus {
+            caret-color: #000;
+            outline: none;
+            border-color: #555555;
+            animation: fadeIn 0.2s;
+        }   
+    }
+}
+

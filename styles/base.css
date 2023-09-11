@@ -1,0 +1,52 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  padding-top: 30px;
+}
+
+#gameBoard {
+  width: 100%;
+  background-color: #000;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.row .box {
+  font-size: 30px;
+  width: 60px;
+  height: 60px;
+  margin: 2px;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #3a2e2e;
+  text-align: center;
+  text-transform: capitalize;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.row .box:focus {
+  caret-color: #000;
+  outline: none;
+  border-color: #555555;
+  animation: fadeIn 0.2s;
+}/*# sourceMappingURL=base.css.map */
