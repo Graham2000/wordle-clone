@@ -3,22 +3,26 @@
 
 // Init entry and add event listeners
 window.onload = () => {
-    let boxes: any = document.getElementsByClassName("box");
+    let boxes = document.getElementsByClassName("box");
 
     // Entry box
-    boxes[0].disabled = false;
-    boxes[0].focus();
+    let firstInput = boxes[0] as HTMLInputElement;
+    firstInput.disabled = false;
+    firstInput.focus();
 
-    let overlay: any = document.getElementById("overlay");
+    let overlay = document.getElementById("overlay");
 
-    overlay.addEventListener("click", () => {
-        for(let i = 0; i < boxes.length; i++) {
-            if (boxes[i].disabled === false) {
-                boxes[i].focus();
+    if (overlay !== null) {
+        overlay.addEventListener("click", () => {
+            for(let i = 0; i < boxes.length; i++) {
+                let box = boxes[i] as HTMLInputElement;
+                if (box.disabled === false) {
+                    box.focus();
+                }
+        
             }
-    
-        }
-    });
+        });
+    }
 
 }
 
@@ -49,24 +53,27 @@ getWordList(GUESS_SRC).then(guessList => {
 
 ////////////////////////////////
 
-const moveToPrev = (input: any): void => {
-    input.value = "";
-    input.previousElementSibling.disabled = false;
-    input.previousElementSibling.focus();
-    input.disabled = true;
-}
+const configInput = (currInput: HTMLInputElement, prev: boolean): void => {
+    let elem: HTMLInputElement;
 
-const moveToNext = (input: any): void => {
-    input.nextElementSibling.disabled = false;
-    input.nextElementSibling.focus();
-    input.disabled = true
+    // Move to next block
+    if (prev) {
+        elem = <HTMLInputElement>currInput.previousElementSibling;
+        currInput.value = "";
+    } else {
+        elem = <HTMLInputElement>currInput.nextElementSibling;
+    }
+
+    currInput.disabled = true;
+    elem.disabled = false;
+    elem.focus();
 }
 
 // New row
-const newGuess = (currBox: any, nextRow: any): void => {
+const newGuess = (currBox: Element, nextRow: Element): void => {
     if (nextRow) {
-        currBox.disabled = false;
-        currBox.focus();
+        (currBox as HTMLInputElement).disabled = false;
+        (currBox as HTMLInputElement).focus();
     } else {
         alert("You are out of guesses! The answer was: wod");
     }
@@ -81,17 +88,29 @@ const isLetter = (c: string): boolean => {
 const ENTER_KEY_CODE: number = 13;
 const BACKSPACE_KEY_CODE: number = 8;
 
-const handleKeyPress = (e: any) => {
-    let prevInput: HTMLElement = e.target.previousElementSibling;
-    let nextInput: HTMLElement = e.target.nextElementSibling;
+const handleKeyPress = (e: KeyboardEvent) => {
+    let elemTarget = e.target as HTMLInputElement;
 
-    let nextRow: HTMLElement;
-    let currBox: HTMLElement;
+    let prevInput: Element;
+    let nextInput: Element;
 
-    if (e.target.parentElement.nextElementSibling && 
-        e.target.parentElement.nextElementSibling.firstElementChild) {
-        nextRow = e.target.parentElement.nextElementSibling;
-        currBox = e.target.parentElement.nextElementSibling.firstElementChild;
+    if (elemTarget.previousElementSibling) {
+        prevInput = elemTarget.previousElementSibling;
+    }
+
+    if (elemTarget.nextElementSibling) {
+        nextInput = elemTarget.nextElementSibling;
+    }
+
+    let nextRow: Element;
+    let currBox: Element;
+
+    if (elemTarget.parentElement?.nextElementSibling) {
+        nextRow = elemTarget.parentElement.nextElementSibling;
+    }
+
+    if (elemTarget.parentElement?.nextElementSibling?.firstElementChild) {
+        currBox = elemTarget.parentElement.nextElementSibling.firstElementChild;
     }
 
     setTimeout(() => {
@@ -100,20 +119,21 @@ const handleKeyPress = (e: any) => {
             // If last box in row
                 // Check if word is valid guess or answer
 
-            e.target.disabled = true;
+            elemTarget.disabled = true;
             newGuess(currBox, nextRow);
             
         } else if (e.keyCode == BACKSPACE_KEY_CODE) {
 
-            prevInput && moveToPrev(e.target);
+            prevInput && configInput(elemTarget, true);
 
-        } else if (isLetter(e.target.value)) {    
+        } else if (isLetter(elemTarget.value)) {    
 
-            nextInput && moveToNext(e.target);
+            nextInput && configInput(elemTarget, false)
 
         } else {
-            e.target.value = "";
+            elemTarget.value = "";
         }
         
     });
+
 }

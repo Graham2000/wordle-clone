@@ -10,16 +10,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 window.onload = () => {
     let boxes = document.getElementsByClassName("box");
-    boxes[0].disabled = false;
-    boxes[0].focus();
+    let firstInput = boxes[0];
+    firstInput.disabled = false;
+    firstInput.focus();
     let overlay = document.getElementById("overlay");
-    overlay.addEventListener("click", () => {
-        for (let i = 0; i < boxes.length; i++) {
-            if (boxes[i].disabled === false) {
-                boxes[i].focus();
+    if (overlay !== null) {
+        overlay.addEventListener("click", () => {
+            for (let i = 0; i < boxes.length; i++) {
+                let box = boxes[i];
+                if (box.disabled === false) {
+                    box.focus();
+                }
             }
-        }
-    });
+        });
+    }
 };
 const ANSWER_SRC = "../res/answer-list.txt";
 const GUESS_SRC = "../res/guess-list.txt";
@@ -33,16 +37,18 @@ getWordList(ANSWER_SRC).then(answerList => {
 getWordList(GUESS_SRC).then(guessList => {
     console.log(guessList);
 });
-const moveToPrev = (input) => {
-    input.value = "";
-    input.previousElementSibling.disabled = false;
-    input.previousElementSibling.focus();
-    input.disabled = true;
-};
-const moveToNext = (input) => {
-    input.nextElementSibling.disabled = false;
-    input.nextElementSibling.focus();
-    input.disabled = true;
+const configInput = (currInput, prev) => {
+    let elem;
+    if (prev) {
+        elem = currInput.previousElementSibling;
+        currInput.value = "";
+    }
+    else {
+        elem = currInput.nextElementSibling;
+    }
+    currInput.disabled = true;
+    elem.disabled = false;
+    elem.focus();
 };
 const newGuess = (currBox, nextRow) => {
     if (nextRow) {
@@ -59,28 +65,37 @@ const isLetter = (c) => {
 const ENTER_KEY_CODE = 13;
 const BACKSPACE_KEY_CODE = 8;
 const handleKeyPress = (e) => {
-    let prevInput = e.target.previousElementSibling;
-    let nextInput = e.target.nextElementSibling;
+    var _a, _b, _c;
+    let elemTarget = e.target;
+    let prevInput;
+    let nextInput;
+    if (elemTarget.previousElementSibling) {
+        prevInput = elemTarget.previousElementSibling;
+    }
+    if (elemTarget.nextElementSibling) {
+        nextInput = elemTarget.nextElementSibling;
+    }
     let nextRow;
     let currBox;
-    if (e.target.parentElement.nextElementSibling &&
-        e.target.parentElement.nextElementSibling.firstElementChild) {
-        nextRow = e.target.parentElement.nextElementSibling;
-        currBox = e.target.parentElement.nextElementSibling.firstElementChild;
+    if ((_a = elemTarget.parentElement) === null || _a === void 0 ? void 0 : _a.nextElementSibling) {
+        nextRow = elemTarget.parentElement.nextElementSibling;
+    }
+    if ((_c = (_b = elemTarget.parentElement) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.firstElementChild) {
+        currBox = elemTarget.parentElement.nextElementSibling.firstElementChild;
     }
     setTimeout(() => {
         if (e.keyCode === ENTER_KEY_CODE) {
-            e.target.disabled = true;
+            elemTarget.disabled = true;
             newGuess(currBox, nextRow);
         }
         else if (e.keyCode == BACKSPACE_KEY_CODE) {
-            prevInput && moveToPrev(e.target);
+            prevInput && configInput(elemTarget, true);
         }
-        else if (isLetter(e.target.value)) {
-            nextInput && moveToNext(e.target);
+        else if (isLetter(elemTarget.value)) {
+            nextInput && configInput(elemTarget, false);
         }
         else {
-            e.target.value = "";
+            elemTarget.value = "";
         }
     });
 };
