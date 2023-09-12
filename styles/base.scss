@@ -14,10 +14,21 @@ html, body {
     align-items: center;
 }
 
+#overlay {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color:purple;
+    z-index:9999;
+    opacity: 0.1;
+    color:white;
+}
+
 #gameBoard {
-    width: 100%;
-    background-color: $backgroundColor;
-    padding: 10px;
+    display: flex;
+    flex-direction: column;
     @include center;
 }
 
@@ -35,6 +46,7 @@ html, body {
         border: 1px solid #3a2e2e;
         text-align: center;
         text-transform: capitalize;
+        
 
         @keyframes fadeIn {
             0% { opacity: 0; }
