@@ -13,6 +13,7 @@ window.onload = () => {
     let firstInput = boxes[0];
     firstInput.disabled = false;
     firstInput.focus();
+    firstInput.style.borderColor = "#555555";
     let overlay = document.getElementById("overlay");
     if (overlay !== null) {
         overlay.addEventListener("click", () => {
@@ -21,6 +22,17 @@ window.onload = () => {
                 if (box.disabled === false) {
                     box.focus();
                 }
+            }
+        });
+    }
+    for (let i = 0; i < boxes.length; i++) {
+        boxes[i].addEventListener("input", (e) => {
+            let elemTarget = e.target;
+            if (elemTarget.value.length !== 0) {
+                elemTarget.style.borderColor = "#555555";
+            }
+            else {
+                elemTarget.style.borderColor = "#3a2e2e";
             }
         });
     }
@@ -50,6 +62,31 @@ const configInput = (currInput, prev) => {
     elem.disabled = false;
     elem.focus();
 };
+const moveToNext = (currInput) => {
+    let elem;
+    if (currInput.value.length !== 0) {
+        currInput.disabled = true;
+        elem = currInput.nextElementSibling;
+        elem.style.borderColor = "#555555";
+        elem.disabled = false;
+        elem.focus();
+    }
+    currInput.style.borderColor = "#555555";
+};
+const moveToPrev = (currInput) => {
+    let elem;
+    if (currInput.value.length === 0) {
+        currInput.disabled = true;
+        elem = currInput.previousElementSibling;
+        elem.style.borderColor = "#3a2e2e";
+        elem.disabled = false;
+        elem.focus();
+    }
+    else {
+        currInput.value = "";
+    }
+    currInput.style.borderColor = "#3a2e2e";
+};
 const newGuess = (currBox, nextRow) => {
     if (nextRow) {
         currBox.disabled = false;
@@ -65,37 +102,21 @@ const isLetter = (c) => {
 const ENTER_KEY_CODE = 13;
 const BACKSPACE_KEY_CODE = 8;
 const handleKeyPress = (e) => {
-    var _a, _b, _c;
+    var _a, _b;
     let elemTarget = e.target;
-    let prevInput;
-    let nextInput;
-    if (elemTarget.previousElementSibling) {
-        prevInput = elemTarget.previousElementSibling;
-    }
-    if (elemTarget.nextElementSibling) {
-        nextInput = elemTarget.nextElementSibling;
-    }
-    let nextRow;
-    let currBox;
-    if ((_a = elemTarget.parentElement) === null || _a === void 0 ? void 0 : _a.nextElementSibling) {
-        nextRow = elemTarget.parentElement.nextElementSibling;
-    }
-    if ((_c = (_b = elemTarget.parentElement) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.firstElementChild) {
-        currBox = elemTarget.parentElement.nextElementSibling.firstElementChild;
-    }
-    setTimeout(() => {
-        if (e.keyCode === ENTER_KEY_CODE) {
-            elemTarget.disabled = true;
-            newGuess(currBox, nextRow);
+    if (e.keyCode === ENTER_KEY_CODE) {
+        elemTarget.disabled = true;
+        if ((_b = (_a = elemTarget.parentElement) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.firstElementChild) {
+            newGuess(elemTarget.parentElement.nextElementSibling.firstElementChild, elemTarget.parentElement.nextElementSibling);
         }
-        else if (e.keyCode == BACKSPACE_KEY_CODE) {
-            prevInput && configInput(elemTarget, true);
-        }
-        else if (isLetter(elemTarget.value)) {
-            nextInput && configInput(elemTarget, false);
-        }
-        else {
-            elemTarget.value = "";
-        }
-    });
+    }
+    else if (e.keyCode == BACKSPACE_KEY_CODE) {
+        elemTarget.previousElementSibling && moveToPrev(elemTarget);
+    }
+    else if (isLetter(elemTarget.value)) {
+        elemTarget.nextElementSibling && moveToNext(elemTarget);
+    }
+    else {
+        elemTarget.value = "";
+    }
 };

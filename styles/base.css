@@ -32,6 +32,10 @@ html, body {
   align-items: center;
 }
 
+.currentRow {
+  border-color: #555555;
+}
+
 .row {
   display: flex;
   flex-direction: row;
@@ -57,7 +61,7 @@ html, body {
 }
 .row .box:focus {
   caret-color: #000;
+  border-radius: red;
   outline: none;
-  border-color: #555555;
   animation: fadeIn 0.2s;
 }/*# sourceMappingURL=base.css.map */
