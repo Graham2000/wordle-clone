@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 let validList;
 let wordOfDay;
+let guessCount = 0;
+const MAX_GUESSES = 5;
 window.onload = () => {
     let boxes = document.getElementsByClassName("box");
     let firstInput = boxes[0];
@@ -124,11 +126,18 @@ const handleKeyPress = (e) => {
                 window.location.href = "./";
             });
         }
+        else if (guessCount === MAX_GUESSES && validList.includes(guessedWord)) {
+            setTimeout(() => {
+                alert("You are out of guesses");
+                window.location.href = "./";
+            });
+        }
         else if (validList.includes(guessedWord)) {
             elemTarget.disabled = true;
             if ((_b = (_a = elemTarget.parentElement) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.firstElementChild) {
                 newGuess(elemTarget.parentElement.nextElementSibling.firstElementChild, elemTarget.parentElement.nextElementSibling);
             }
+            guessCount++;
         }
         else {
             if (elemTarget.parentElement) {

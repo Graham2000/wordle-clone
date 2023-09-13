@@ -2,6 +2,8 @@
 //let guessList: string[] = [];
 let validList: Array<string>;
 let wordOfDay: string;
+let guessCount = 0;
+const MAX_GUESSES = 5;
 
 // Init entry and add event listeners
 window.onload = () => {
@@ -44,7 +46,6 @@ window.onload = () => {
 
     const ANSWER_SRC: string = "../res/answer-list.txt";
     const GUESS_SRC: string = "../res/guess-list.txt";
-
 
 
     ///////////////////////////////
@@ -175,6 +176,12 @@ const handleKeyPress = (e: KeyboardEvent) => {
                 window.location.href = "./";
             });
          
+        } else if (guessCount === MAX_GUESSES && validList.includes(guessedWord) ) {
+            setTimeout(() => {
+                alert("You are out of guesses");
+                window.location.href = "./";
+            });
+
         } else if (validList.includes(guessedWord)) {
             //alert("Valid guess");
             elemTarget.disabled = true;
@@ -182,6 +189,8 @@ const handleKeyPress = (e: KeyboardEvent) => {
                 newGuess(elemTarget.parentElement.nextElementSibling.firstElementChild, 
                          elemTarget.parentElement.nextElementSibling);
             }
+
+            guessCount++;
 
         } else {
             //alert("Invalid guess");
