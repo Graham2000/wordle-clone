@@ -1,5 +1,7 @@
 //let answerList: string[] = [];
 //let guessList: string[] = [];
+let validList: Array<string>;
+let wordOfDay: string;
 
 // Init entry and add event listeners
 window.onload = () => {
@@ -40,53 +42,49 @@ window.onload = () => {
         });
     }
 
-}
+    const ANSWER_SRC: string = "../res/answer-list.txt";
+    const GUESS_SRC: string = "../res/guess-list.txt";
 
 
 
+    ///////////////////////////////
+    // Generate random word of day from answer list
 
-const ANSWER_SRC: string = "../res/answer-list.txt";
-const GUESS_SRC: string = "../res/guess-list.txt";
+    const generateWOD = (answerList: Array<string>): string => {
+        const index = Math.floor(Math.random() * answerList.length - 1);
+        return answerList[index];
+    }
+    //////////////////////////////
 
-const getWordList = async (src: string): Promise<string[]> => {
-    const list = await fetch(src);
-    return ((await list.text()).split("\n"));
-}
-
-getWordList(ANSWER_SRC).then(answerList => {
-    console.log(answerList);
-});
-
-getWordList(GUESS_SRC).then(guessList => {
-    console.log(guessList);
-});
-
-///////////////////////////////
-// Generate random word of day from answer list
-
-
-
-
-
-
-
-////////////////////////////////
-
-const configInput = (currInput: HTMLInputElement, prev: boolean): void => {
-    let elem: HTMLInputElement;
-
-    // Move to previous block
-    if (prev) {
-        elem = <HTMLInputElement>currInput.previousElementSibling;
-        currInput.value = "";
-    } else {
-        elem = <HTMLInputElement>currInput.nextElementSibling;
+    const getWordList = async (src: string): Promise<string[]> => {
+        const list = await fetch(src);
+        return ((await list.text()).split("\n"));
     }
 
-    currInput.disabled = true;
-    elem.disabled = false;
-    elem.focus();
+    getWordList(ANSWER_SRC).then(answerList => {
+ 
+        wordOfDay = generateWOD(answerList);
+        console.log("Word of Day", wordOfDay);
+
+        getWordList(GUESS_SRC).then(guessList => {
+
+            validList = answerList.concat(guessList);
+            console.log("Valid List", validList);
+
+        });
+        
+    });
+
 }
+
+
+
+
+
+
+// Valid guess = guess list + answer list
+
+
 
 const moveToNext = (currInput: HTMLInputElement) => {
     let elem: HTMLInputElement;
@@ -141,14 +139,69 @@ const BACKSPACE_KEY_CODE: number = 8;
 const handleKeyPress = (e: KeyboardEvent) => {
     let elemTarget = e.target as HTMLInputElement;
         
-    if (e.keyCode === ENTER_KEY_CODE) {
+    if (e.keyCode === ENTER_KEY_CODE && elemTarget.nextElementSibling === null) {
         // If last box in row
             // Check if word is valid guess or answer
 
-        elemTarget.disabled = true;
-        if (elemTarget.parentElement?.nextElementSibling?.firstElementChild) {
-            newGuess(elemTarget.parentElement.nextElementSibling.firstElementChild, 
-                     elemTarget.parentElement.nextElementSibling);
+        // Output feedback 
+        let guessedWord = "";
+        if (elemTarget.parentElement) {
+            const row: HTMLCollection = elemTarget.parentElement.children;
+            
+            for (let i = 0; i < row.length; i++) {
+                let box = row[i] as HTMLInputElement;
+                guessedWord += box.value;
+
+                if (wordOfDay[i] === guessedWord[i]) {
+                    // Correct letter, correct pos
+                    box.style.backgroundColor = "#538d4e";
+                } else if (wordOfDay.includes(guessedWord[i])) {
+                    // Correct letter, wrong pos
+                    box.style.backgroundColor = "#b59f3b";
+                } else {
+                    // Wrong letter, wrong pos
+                    box.style.backgroundColor = "#363636";
+                }
+                //box.style.borderColor = "#3a2e2e";
+            }
+
+        }
+
+        console.log("gw", guessedWord);
+
+        if (guessedWord === wordOfDay) {
+            setTimeout(() => {
+                alert("You guessed the correct word!");
+                window.location.href = "./";
+            });
+         
+        } else if (validList.includes(guessedWord)) {
+            //alert("Valid guess");
+            elemTarget.disabled = true;
+            if (elemTarget.parentElement?.nextElementSibling?.firstElementChild) {
+                newGuess(elemTarget.parentElement.nextElementSibling.firstElementChild, 
+                         elemTarget.parentElement.nextElementSibling);
+            }
+
+        } else {
+            //alert("Invalid guess");
+            if (elemTarget.parentElement) {
+                const row: HTMLElement = elemTarget.parentElement;
+                for (let i = 0; i < row.childElementCount; i++) {
+                    let box = row.children[i] as HTMLInputElement;
+
+                    // Reset color to base
+                    box.style.backgroundColor = "#000";
+                    guessedWord += box.value;
+                }
+
+                row.classList.add("shakeAnimation");
+
+                setTimeout(() => {
+                    row.classList.remove("shakeAnimation");
+                }, 300)
+            }
+
         }
         
     } else if (e.keyCode == BACKSPACE_KEY_CODE) {
@@ -157,7 +210,7 @@ const handleKeyPress = (e: KeyboardEvent) => {
 
     } else if (isLetter(elemTarget.value)) {    
 
-        elemTarget.nextElementSibling && moveToNext(elemTarget);
+       elemTarget.nextElementSibling && moveToNext(elemTarget);
 
     } else {
         elemTarget.value = "";

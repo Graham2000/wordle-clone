@@ -8,6 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+let validList;
+let wordOfDay;
 window.onload = () => {
     let boxes = document.getElementsByClassName("box");
     let firstInput = boxes[0];
@@ -36,31 +38,24 @@ window.onload = () => {
             }
         });
     }
-};
-const ANSWER_SRC = "../res/answer-list.txt";
-const GUESS_SRC = "../res/guess-list.txt";
-const getWordList = (src) => __awaiter(void 0, void 0, void 0, function* () {
-    const list = yield fetch(src);
-    return ((yield list.text()).split("\n"));
-});
-getWordList(ANSWER_SRC).then(answerList => {
-    console.log(answerList);
-});
-getWordList(GUESS_SRC).then(guessList => {
-    console.log(guessList);
-});
-const configInput = (currInput, prev) => {
-    let elem;
-    if (prev) {
-        elem = currInput.previousElementSibling;
-        currInput.value = "";
-    }
-    else {
-        elem = currInput.nextElementSibling;
-    }
-    currInput.disabled = true;
-    elem.disabled = false;
-    elem.focus();
+    const ANSWER_SRC = "../res/answer-list.txt";
+    const GUESS_SRC = "../res/guess-list.txt";
+    const generateWOD = (answerList) => {
+        const index = Math.floor(Math.random() * answerList.length - 1);
+        return answerList[index];
+    };
+    const getWordList = (src) => __awaiter(void 0, void 0, void 0, function* () {
+        const list = yield fetch(src);
+        return ((yield list.text()).split("\n"));
+    });
+    getWordList(ANSWER_SRC).then(answerList => {
+        wordOfDay = generateWOD(answerList);
+        console.log("Word of Day", wordOfDay);
+        getWordList(GUESS_SRC).then(guessList => {
+            validList = answerList.concat(guessList);
+            console.log("Valid List", validList);
+        });
+    });
 };
 const moveToNext = (currInput) => {
     let elem;
@@ -104,10 +99,50 @@ const BACKSPACE_KEY_CODE = 8;
 const handleKeyPress = (e) => {
     var _a, _b;
     let elemTarget = e.target;
-    if (e.keyCode === ENTER_KEY_CODE) {
-        elemTarget.disabled = true;
-        if ((_b = (_a = elemTarget.parentElement) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.firstElementChild) {
-            newGuess(elemTarget.parentElement.nextElementSibling.firstElementChild, elemTarget.parentElement.nextElementSibling);
+    if (e.keyCode === ENTER_KEY_CODE && elemTarget.nextElementSibling === null) {
+        let guessedWord = "";
+        if (elemTarget.parentElement) {
+            const row = elemTarget.parentElement.children;
+            for (let i = 0; i < row.length; i++) {
+                let box = row[i];
+                guessedWord += box.value;
+                if (wordOfDay[i] === guessedWord[i]) {
+                    box.style.backgroundColor = "#538d4e";
+                }
+                else if (wordOfDay.includes(guessedWord[i])) {
+                    box.style.backgroundColor = "#b59f3b";
+                }
+                else {
+                    box.style.backgroundColor = "#363636";
+                }
+            }
+        }
+        console.log("gw", guessedWord);
+        if (guessedWord === wordOfDay) {
+            setTimeout(() => {
+                alert("You guessed the correct word!");
+                window.location.href = "./";
+            });
+        }
+        else if (validList.includes(guessedWord)) {
+            elemTarget.disabled = true;
+            if ((_b = (_a = elemTarget.parentElement) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.firstElementChild) {
+                newGuess(elemTarget.parentElement.nextElementSibling.firstElementChild, elemTarget.parentElement.nextElementSibling);
+            }
+        }
+        else {
+            if (elemTarget.parentElement) {
+                const row = elemTarget.parentElement;
+                for (let i = 0; i < row.childElementCount; i++) {
+                    let box = row.children[i];
+                    box.style.backgroundColor = "#000";
+                    guessedWord += box.value;
+                }
+                row.classList.add("shakeAnimation");
+                setTimeout(() => {
+                    row.classList.remove("shakeAnimation");
+                }, 300);
+            }
         }
     }
     else if (e.keyCode == BACKSPACE_KEY_CODE) {

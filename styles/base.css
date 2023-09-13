@@ -39,6 +39,7 @@ html, body {
 .row {
   display: flex;
   flex-direction: row;
+  transition: transform 0.3s ease-in-out;
 }
 .row .box {
   font-size: 30px;
@@ -60,8 +61,27 @@ html, body {
   }
 }
 .row .box:focus {
-  caret-color: #000;
+  caret-color: transparent;
   border-radius: red;
   outline: none;
   animation: fadeIn 0.2s;
+}
+
+.shakeAnimation {
+  animation: shake 0.3s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
 }/*# sourceMappingURL=base.css.map */
